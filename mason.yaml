@@ -7,7 +7,7 @@ bricks:
     widget:
       git:
         url: https://github.com/lucavenir/media_service_brick
-        path: mediaservice
+
   #     path: bricks/widget
   # Add more bricks here.
   # Bricks can be imported via version constraint from a registry.
