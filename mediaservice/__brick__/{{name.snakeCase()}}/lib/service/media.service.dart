@@ -15,6 +15,10 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+{{#files}}
+import 'package:file_picker/file_picker.dart';
+{{/files}}
+
 
 import '../errors/canceled_media_pick.exception.dart';
 import '../errors/unsupported_media.exception.dart';
@@ -28,49 +32,92 @@ class MediaService {
   final Dio httpClient;
   final ImagePicker imagePicker;
 
-  // TODO(dario): if (image && video) ...
+
+  {{#videos}}
+  {{#images}}
   Future<LocalAttachment> pickMedia() async {
     final result = await imagePicker.pickMedia();
     if (result == null) throw const CanceledMediaOperationException();
     final mimeType = mimeTypeLookup(result.path);
     final split = mimeType.split('/');
     final type = split.first;
-
     final uri = Uri.file(result.path);
     return switch (type) {
       'image' => LocalPictureAttachment(uri),
       'video' => LocalVideoAttachment(uri),
+      'pdf' => LocalPdfAttachment(uri),
       _ => throw UnsupportedMediaException(mimeType),
     };
   }
-  // TODO(dario): else if (image && !video) ...
-  // TODO(dario): else if (!image && video) ...
+  {{/videos}}
+  {{/images}}
 
-  // TODO(dario): if (image) ...
-  Future<LocalPictureAttachment> pickImageFromCamera() async {
+
+   {{^videos}}
+   {{#images}}
+  Future<LocalPictureAttachment> pickImageFromGallery() async {
+    final result = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (result == null) throw const CanceledMediaOperationException();
+    final uri = Uri.file(result.path);
+    return LocalPictureAttachment(uri);
+  }
+   {{/videos}}
+   {{/images}}
+
+  
+   {{#images}}
+   Future<LocalPictureAttachment> pickImageFromCamera() async {
     final result = await imagePicker.pickImage(source: ImageSource.camera);
     if (result == null) throw const CanceledMediaOperationException();
-    final file = io.File(result.path);
+    final file = Uri.file(result.path);
     return LocalPictureAttachment(file);
+  } 
+  {{/images}}
+
+
+   {{#videos}}
+   {{^images}}
+  Future<LocalAttachment> pickVideoFromGallery() async {
+    final result = await imagePicker.pickVideo(source: ImageSource.gallery);
+    if (result == null) throw const CanceledMediaOperationException();
+    final uri = Uri.file(result.path);
+    return LocalVideoAttachment(uri);
   }
+  {{/videos}}
+  {{/images}}
 
-  // TODO(dario): if (video) ...
-  // TODO(dario): implement video pick from camera
-
-  // TODO(dario): delete this
-  Future<void> downloadAndOpen({
-    required NetworkAttachment attachment,
-  }) async {
-    final file = await download(attachment: attachment);
-    await openFile(File(file.path));
+  
+  {{#videos}}
+  Future<LocalAttachment> pickVideoFromCamera() async {
+    final result = await imagePicker.pickVideo(source: ImageSource.camera);
+    if (result == null) throw const CanceledMediaOperationException();
+    final uri = Uri.file(result.path);
+    return LocalVideoAttachment(uri);
   }
+  {{/videos}}
+ 
+ {{#files}}
+ {{^images}}
+ {{^videos}}
+ Future<LocalAttachment> pickPdf()async{
+  final f = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf'], allowMultiple: false);
+  if (f == null) throw const CanceledMediaOperationException();
+  final uri = Uri.file(f.files.first.path!);
+  return LocalPdfAttachment(uri);
+    
+ }
+ {{/files}}
+ {{/videos}}
+ {{/images}} 
 
-  // TODO(dario): if (file_open) ...
-  Future<void> openFile(io.File file) {
-    return OpenFilex.open(file.path);
+
+  {{#files}}
+  Future<void> openFile(Uri uri) {
+    return OpenFilex.open(uri.path);
   }
+  {{/files}}
 
-  // TODO(dario): if (file_download) ...
+
   Future<Uri> download({required NetworkAttachment attachment}) async {
     final dir = await path_provider.getDownloadsDirectory();
     final filePath = path.join(dir!.path, attachment.uri.pathSegments.last);

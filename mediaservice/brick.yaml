@@ -31,3 +31,33 @@ vars:
     default: my_app
     prompt: What is this project's name?
     description: Your project's name
+
+  images:
+    type: boolean
+    default: true
+    prompt: Do you want to include images?
+    description: Whether or not to include images
+
+  video:
+    type: boolean
+    default: true
+    prompt: Do you want to include videos?
+    description: Whether or not to include videos
+
+  files:
+    type: boolean
+    default: true
+    prompt: Do you want to include pdf files?
+    description: Whether or not to include pdf files
+
+  hooks:
+    type: boolean
+    default: true
+    prompt: Do you want to include hooks?
+    description: Whether or not to include hooks
+
+  generation:
+    type: boolean
+    default: true
+    prompt: Do you want to include build_runner generation?
+    description: Whether or not to include build runner

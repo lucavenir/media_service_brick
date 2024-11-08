@@ -6,28 +6,22 @@ import 'context_variables.dart';
 
 Future<void> addDependencies(HookContext context) async {
   final dependencies = [
-    // TODO(dario): if (hooks) ...
-    'hooks_riverpod',
-    // TODO(dario): else ...
-    'flutter_riverpod',
+    if (context.hooks) 'hooks_riverpod' else 'flutter_riverpod',
+    if (context.hooks) 'flutter_hooks',
     'riverpod_annotation',
     'freezed_annotation',
     'json_annotation',
     'dio',
-    // TODO(dario): if (images) ...
-    'image_picker',
-    // TODO(dario): if (files) ...
-    'open_filex',
+    if (context.images) 'image_picker',
+    if (context.files) 'open_filex',
+    if (context.files) 'file_picker',
     'path',
     'path_provider',
     'mime',
-    'talker_dio_logger', // TODO(dario): ?
-    'stack_trace', // TODO(dario): ?
   ];
 
   final devDependencies = [
-    // TODO(dario): if (generation) ...
-    'build_runner',
+    if (context.generation) 'build_runner',
     'freezed',
     'json_serializable',
     'riverpod_generator',
