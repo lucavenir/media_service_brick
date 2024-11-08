@@ -4,18 +4,14 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+{{#imagesOrVideos}}
 import 'package:image_picker/image_picker.dart';
+{{/imagesOrVideos}}
 import 'package:mime/mime.dart';
-import 'package:oneplatform/api/attachments/upload_attachment_request.api.model.dart';
-import 'package:oneplatform/api/auth_http_client.dart';
-import 'package:oneplatform/src/attachments/errors/canceled_image_pick.exception.dart';
-import 'package:oneplatform/src/attachments/errors/unsupported_media.exception.dart';
-import 'package:oneplatform/src/attachments/models/attachment.model.dart';
-import 'package:open_filex/open_filex.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as path_provider;
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 {{#files}}
+import 'package:open_filex/open_filex.dart';
 import 'package:file_picker/file_picker.dart';
 {{/files}}
 
@@ -24,18 +20,22 @@ import '../errors/canceled_media_pick.exception.dart';
 import '../errors/unsupported_media.exception.dart';
 import '../models/attachment.model.dart';
 
+
 class MediaService {
   const MediaService({
     required this.httpClient,
+    {{#imagesOrVideos}}
     required this.imagePicker,
+    {{/imagesOrVideos}}
   });
   final Dio httpClient;
+  {{#imagesOrVideos}}
   final ImagePicker imagePicker;
+  {{/imagesOrVideos}}
 
 
-  {{#videos}}
-  {{#images}}
-  Future<LocalAttachment> pickMedia() async {
+  {{#imagesAndVideos}}
+  Future<LocalAttachment> pickVideosOrImagesFromGallery() async {
     final result = await imagePicker.pickMedia();
     if (result == null) throw const CanceledMediaOperationException();
     final mimeType = mimeTypeLookup(result.path);
@@ -49,23 +49,19 @@ class MediaService {
       _ => throw UnsupportedMediaException(mimeType),
     };
   }
-  {{/videos}}
-  {{/images}}
+  {{/imagesAndVideos}}
 
-
-   {{^videos}}
-   {{#images}}
+  {{#images}}
   Future<LocalPictureAttachment> pickImageFromGallery() async {
     final result = await imagePicker.pickImage(source: ImageSource.gallery);
     if (result == null) throw const CanceledMediaOperationException();
     final uri = Uri.file(result.path);
     return LocalPictureAttachment(uri);
   }
-   {{/videos}}
-   {{/images}}
+  {{/images}}
 
   
-   {{#images}}
+  {{#images}}
    Future<LocalPictureAttachment> pickImageFromCamera() async {
     final result = await imagePicker.pickImage(source: ImageSource.camera);
     if (result == null) throw const CanceledMediaOperationException();
@@ -75,8 +71,7 @@ class MediaService {
   {{/images}}
 
 
-   {{#videos}}
-   {{^images}}
+  {{#videos}}
   Future<LocalAttachment> pickVideoFromGallery() async {
     final result = await imagePicker.pickVideo(source: ImageSource.gallery);
     if (result == null) throw const CanceledMediaOperationException();
@@ -84,9 +79,7 @@ class MediaService {
     return LocalVideoAttachment(uri);
   }
   {{/videos}}
-  {{/images}}
 
-  
   {{#videos}}
   Future<LocalAttachment> pickVideoFromCamera() async {
     final result = await imagePicker.pickVideo(source: ImageSource.camera);
@@ -97,19 +90,13 @@ class MediaService {
   {{/videos}}
  
  {{#files}}
- {{^images}}
- {{^videos}}
- Future<LocalAttachment> pickPdf()async{
+ Future<LocalAttachment> pickPdf() async {
   final f = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf'], allowMultiple: false);
   if (f == null) throw const CanceledMediaOperationException();
   final uri = Uri.file(f.files.first.path!);
   return LocalPdfAttachment(uri);
-    
  }
  {{/files}}
- {{/videos}}
- {{/images}} 
-
 
   {{#files}}
   Future<void> openFile(Uri uri) {

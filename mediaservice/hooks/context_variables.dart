@@ -7,6 +7,8 @@ extension RiverpodCoreContextExt on HookContext {
   bool get files => extract('files');
   bool get hooks => extract('hooks');
   bool get generation => extract('generation');
+  bool get imagesOrVideos => extract('imagesOrVideos');
+  bool get imagesAndVideos => extract('imagesAndVideos');
 
   T extract<T>(String varName) {
     if (!vars.containsKey(varName)) throw MissingContextVarException(varName);
