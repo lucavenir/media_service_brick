@@ -16,7 +16,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../errors/canceled_image_pick.exception.dart';
+import '../errors/canceled_media_pick.exception.dart';
 import '../errors/unsupported_media.exception.dart';
 import '../models/attachment.model.dart';
 
@@ -28,6 +28,7 @@ class MediaService {
   final Dio httpClient;
   final ImagePicker imagePicker;
 
+  // TODO(dario): if (image && video) ...
   Future<LocalAttachment> pickMedia() async {
     final result = await imagePicker.pickMedia();
     if (result == null) throw const CanceledMediaOperationException();
@@ -42,7 +43,10 @@ class MediaService {
       _ => throw UnsupportedMediaException(mimeType),
     };
   }
+  // TODO(dario): else if (image && !video) ...
+  // TODO(dario): else if (!image && video) ...
 
+  // TODO(dario): if (image) ...
   Future<LocalPictureAttachment> pickImageFromCamera() async {
     final result = await imagePicker.pickImage(source: ImageSource.camera);
     if (result == null) throw const CanceledMediaOperationException();
@@ -50,6 +54,10 @@ class MediaService {
     return LocalPictureAttachment(file);
   }
 
+  // TODO(dario): if (video) ...
+  // TODO(dario): implement video pick from camera
+
+  // TODO(dario): delete this
   Future<void> downloadAndOpen({
     required NetworkAttachment attachment,
   }) async {
@@ -57,10 +65,12 @@ class MediaService {
     await openFile(File(file.path));
   }
 
+  // TODO(dario): if (file_open) ...
   Future<void> openFile(io.File file) {
     return OpenFilex.open(file.path);
   }
 
+  // TODO(dario): if (file_download) ...
   Future<Uri> download({required NetworkAttachment attachment}) async {
     final dir = await path_provider.getDownloadsDirectory();
     final filePath = path.join(dir!.path, attachment.uri.pathSegments.last);

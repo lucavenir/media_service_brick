@@ -19,7 +19,8 @@ sealed class LocalAttachment extends Attachment {
   const LocalAttachment();
 }
 
-class LocalPictureAttachment extends LocalAttachment implements PictureAttachment {
+class LocalPictureAttachment extends LocalAttachment
+    implements PictureAttachment {
   const LocalPictureAttachment(this.uri);
   @override
   final Uri uri;
@@ -43,11 +44,13 @@ sealed class NetworkAttachment extends Attachment {
   final Uri uri;
 }
 
-class NetworkPictureAttachment extends NetworkAttachment implements PictureAttachment {
+class NetworkPictureAttachment extends NetworkAttachment
+    implements PictureAttachment {
   const NetworkPictureAttachment(super.uri);
 }
 
-class NetworkVideoAttachment extends NetworkAttachment implements VideoAttachment {
+class NetworkVideoAttachment extends NetworkAttachment
+    implements VideoAttachment {
   const NetworkVideoAttachment(super.uri);
 }
 
