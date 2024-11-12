@@ -1,6 +1,17 @@
 import 'dart:convert' as convert;
 import 'dart:io' as io;
 import 'dart:io';
+{{#generation}}
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+{{/generation}}
+{{^generation}}
+{{#hooks}}
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+{{/hooks}}
+{{^hooks}}
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+{{/hooks}}
+{{/generation}}
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -20,6 +31,31 @@ import '../errors/canceled_media_pick.exception.dart';
 import '../errors/unsupported_media.exception.dart';
 import '../models/attachment.model.dart';
 
+
+part 'media.service.g.dart';
+
+{{#imagesOrVideos}}
+@riverpod
+ImagePicker imagePicker(ImagePickerRef ref) {
+  return ImagePicker();
+}
+{{/imagesOrVideos}}
+
+@riverpod
+MediaService mediaService(MediaServiceRef ref) {
+  final client = ref.watch(authHttpClientProvider);
+  {{#imagesOrVideos}}
+   final picker = ref.watch(imagePickerProvider);
+{{/imagesOrVideos}}
+  
+  return MediaService(
+    
+    httpClient: client,
+{{#imagesOrVideos}}
+    imagePicker: picker,
+{{/imagesOrVideos}}
+  );
+}
 
 class MediaService {
   const MediaService({
@@ -45,7 +81,6 @@ class MediaService {
     return switch (type) {
       'image' => LocalPictureAttachment(uri),
       'video' => LocalVideoAttachment(uri),
-      'pdf' => LocalPdfAttachment(uri),
       _ => throw UnsupportedMediaException(mimeType),
     };
   }
