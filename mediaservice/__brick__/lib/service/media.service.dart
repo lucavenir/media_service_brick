@@ -69,7 +69,7 @@ class MediaService {
   final ImagePicker imagePicker;
   {{/imagesOrVideos}}
 
-
+///pick video or image  from gallery, check mime type, if valid, return LocalAttacment
   {{#imagesAndVideos}}
   Future<LocalAttachment> pickVideosOrImagesFromGallery() async {
     final result = await imagePicker.pickMedia();
@@ -86,6 +86,7 @@ class MediaService {
   }
   {{/imagesAndVideos}}
 
+///pick image  from gallery and return LocalPictureAttacment
   {{#images}}
   Future<LocalPictureAttachment> pickImageFromGallery() async {
     final result = await imagePicker.pickImage(source: ImageSource.gallery);
@@ -95,7 +96,7 @@ class MediaService {
   }
   {{/images}}
 
-  
+  ///pick image  from camera and return LocalPictureAttacment
   {{#images}}
    Future<LocalPictureAttachment> pickImageFromCamera() async {
     final result = await imagePicker.pickImage(source: ImageSource.camera);
@@ -105,9 +106,9 @@ class MediaService {
   } 
   {{/images}}
 
-
+///pick video from gallery and return LocalVideoAttacment
   {{#videos}}
-  Future<LocalAttachment> pickVideoFromGallery() async {
+  Future<LocalVideoAttachment> pickVideoFromGallery() async {
     final result = await imagePicker.pickVideo(source: ImageSource.gallery);
     if (result == null) throw const CanceledMediaOperationException();
     final uri = Uri.file(result.path);
@@ -115,6 +116,7 @@ class MediaService {
   }
   {{/videos}}
 
+  ///pick video from camera and return LocalVideoAttacment
   {{#videos}}
   Future<LocalAttachment> pickVideoFromCamera() async {
     final result = await imagePicker.pickVideo(source: ImageSource.camera);
@@ -124,6 +126,7 @@ class MediaService {
   }
   {{/videos}}
  
+ ///Pick pdf from device and return LocalPdfAttacment
  {{#files}}
  Future<LocalAttachment> pickPdf() async {
   final f = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['pdf'], allowMultiple: false);
@@ -133,13 +136,14 @@ class MediaService {
  }
  {{/files}}
 
+///Open file in device
   {{#files}}
   Future<void> openFile(Uri uri) {
     return OpenFilex.open(uri.path);
   }
   {{/files}}
 
-
+///create a Uri.file from network attachment
   Future<Uri> download({required NetworkAttachment attachment}) async {
     final dir = await path_provider.getDownloadsDirectory();
     final filePath = path.join(dir!.path, attachment.uri.pathSegments.last);
@@ -148,11 +152,13 @@ class MediaService {
     return file;
   }
 
+///encode file to base64
   @protected
   Future<String> base64Encode(io.File file) {
     return compute(encodeToBase64, file);
   }
 
+///lookup mime type from path
   @protected
   @visibleForTesting
   String mimeTypeLookup(String path) {
@@ -164,6 +170,7 @@ class MediaService {
     return mimeType;
   }
 
+///check if mime type is image or video
   @protected
   @visibleForTesting
   void assertIsImageOrVideo(String mimeType) {
@@ -174,6 +181,7 @@ class MediaService {
   }
 }
 
+///encode file to base64
 @protected
 Future<String> encodeToBase64(io.File file) async {
   final bytes = await file.readAsBytes();
